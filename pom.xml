@@ -1,0 +1,194 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <!--
+    **** NOTE: HTSJDK (formerly part of Picard/Samtools) is a
+    **** third-party dependency of Hadoop-BAM. This artifact was
+    **** released since currently there is no first-party artifact
+    **** for HTSJDK available.
+    ****
+    ****       For further information on HTSJDK see:
+    ****       https://github.com/samtools/htsjdk/
+    ****
+    **** This POM file is based on:
+    **** https://github.com/azymer/htsjdk/blob/271692b2406b1ae980b43fa95981672798b4f295/pom.xml
+    -->
+
+
+    <!-- add this to your shell:
+         export MAVEN_OPTS="-Xms256m -Xmx1g -XX:MaxPermSize=256m" -->
+
+    <!-- when running tests from an intellij project that was setup
+         via importing a project from maven, be sure to set the
+         working directory to the top level htsjdk directory -->
+
+    <parent>
+        <groupId>org.sonatype.oss</groupId>
+        <artifactId>oss-parent</artifactId>
+        <version>7</version>
+        <relativePath />
+    </parent>
+
+    <groupId>org.seqdoop</groupId>
+    <artifactId>htsjdk</artifactId>
+    <version>1.118</version>
+    <packaging>jar</packaging>
+    <name>HTS JDK</name>
+    <description>A Java API for high-throughput sequencing data (HTS) formats.</description>
+    <url>https://github.com/samtools/htsjdk/</url>
+
+    <repositories>
+        <repository>
+            <id>sonatype-nexus-snapshots</id>
+            <name>Sonatype Nexus Snapshots</name>
+            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+        </repository>
+    </repositories>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.apache.ant</groupId>
+            <artifactId>ant</artifactId>
+            <version>1.8.2</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.bcel</groupId>
+            <artifactId>bcel</artifactId>
+            <version>5.2</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.seqdoop</groupId>
+            <artifactId>cofoja</artifactId>
+            <version>1.1-r150-SNAPSHOT</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-jexl</artifactId>
+            <version>2.1.1</version>
+        </dependency>
+
+        <dependency>
+            <groupId>commons-logging</groupId>
+            <artifactId>commons-logging</artifactId>
+            <version>1.1.1</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.xerial.snappy</groupId>
+            <artifactId>snappy-java</artifactId>
+            <version>1.0.3-rc3</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.testng</groupId>
+            <artifactId>testng</artifactId>
+            <!-- was 5.5; this was failing to compile with maven-->
+            <version>6.8.8</version>
+            <scope>compile</scope>
+        </dependency>
+
+    </dependencies>
+
+    <build>
+        <sourceDirectory>src/java</sourceDirectory>
+        <testSourceDirectory>src/tests/java</testSourceDirectory>
+
+        <resources>
+            <resource>
+                <directory>lib/jni</directory>
+                <filtering>true</filtering>
+                <includes>
+                    <include>**/libIntelDeflater.so</include>
+                </includes>
+            </resource>
+        </resources>
+
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-gpg-plugin</artifactId>
+                <version>1.5</version>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-deploy-plugin</artifactId>
+                <version>2.7</version>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <version>2.9.1</version>
+                <executions>
+                    <execution>
+                        <id>attach-javadocs</id>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-source-plugin</artifactId>
+                <version>2.2.1</version>
+                <executions>
+                    <execution>
+                        <id>attach-sources</id>
+                        <goals>
+                            <goal>jar-no-fork</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin> 
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>2.5</version>
+                <configuration>
+                    <archive>
+                        <addMavenDescriptor>false</addMavenDescriptor>
+                        <manifestEntries>
+                            <Implementation-Vendor>${project.groupId}</Implementation-Vendor>
+                            <Implementation-Version>${project.version}</Implementation-Version>
+                        </manifestEntries>
+                    </archive>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.1</version>
+                <configuration>
+                    <source>1.6</source>
+                    <target>1.6</target>
+                    <!-- not sure if this plays nice with cofoja but the build fails without it,
+                     complaining about cofoja "error in contract"-->
+                    <compilerArgument>-proc:none</compilerArgument>
+                    <debug>true</debug>
+                    <optimize>false</optimize>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>2.17</version>
+                <configuration>
+                    <!-- without bumping up memory, maven tests fail -->
+                    <argLine>-Xms256m -Xmx1g -XX:MaxPermSize=256m</argLine>
+                </configuration>
+            </plugin>
+        </plugins>
+
+
+    </build>
+</project>
