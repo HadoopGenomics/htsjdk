@@ -38,14 +38,6 @@
     <description>A Java API for high-throughput sequencing data (HTS) formats.</description>
     <url>https://github.com/samtools/htsjdk/</url>
 
-    <repositories>
-        <repository>
-            <id>sonatype-nexus-snapshots</id>
-            <name>Sonatype Nexus Snapshots</name>
-            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
-        </repository>
-    </repositories>
-
     <dependencies>
         <dependency>
             <groupId>org.apache.ant</groupId>
@@ -62,7 +54,7 @@
         <dependency>
             <groupId>org.seqdoop</groupId>
             <artifactId>cofoja</artifactId>
-            <version>1.1-r150-SNAPSHOT</version>
+            <version>1.1-r150</version>
         </dependency>
 
         <dependency>
@@ -96,16 +88,6 @@
     <build>
         <sourceDirectory>src/java</sourceDirectory>
         <testSourceDirectory>src/tests/java</testSourceDirectory>
-
-        <resources>
-            <resource>
-                <directory>lib/jni</directory>
-                <filtering>true</filtering>
-                <includes>
-                    <include>**/libIntelDeflater.so</include>
-                </includes>
-            </resource>
-        </resources>
 
         <plugins>
             <plugin>
